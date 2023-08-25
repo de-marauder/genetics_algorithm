@@ -1,2 +1,7 @@
 node_modules
 yarn-error*
+bin
+empty.yaml
+output.txt
+population_results.txt
+exclude
