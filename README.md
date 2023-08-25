@@ -45,6 +45,7 @@ The reaction occurs in two main stages
 
 2. > CO + 2H2O  <-->  CO2 + 2H2 (water gas shift)
 
+3. > Total reaction: CH4 + 2H2O => CO2 + 4H2
 
 STEP 1:
 - > Identify the composition of the components of the natural gas
@@ -56,9 +57,13 @@ STEP 2
 - > Find the mole fraction (yi = moles of i/total no of moles in output) of the output components in the gas phase
 
 STEP 3
-- > Calculate equilibrium constants. 
+- Calculate equilibrium constants. 
+  
+  > K = (Pi/Pstand)output^(stoichiometric coefficient of i)/(Pi/Pstand)input^(stoichiometric coefficient of i) (according to the equation stoichiometry)
   > ```
-  > k = (Pi/Pstand)output^(stoichiometric coefficient of i)/(Pi/Pstand)input^(stoichiometric coefficient of i) (according to the equation stoichiometry)
+  > K1 = 10266.76 * 10^6 * exp (-(26830/T) + 30.114)
+  > K2 = exp((4400/T) + 4.036)
+  > K3 = K1 * K2
   > ```
 - > Calculate partial pressures of all components using dalton's law 
   > ```

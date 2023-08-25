@@ -1,0 +1,11 @@
+---
+smrConfig:
+  smrPopSize: 4
+
+flareGasComposition:
+  ch4: 80
+  c2h6: 5
+  c3h8: 5
+  i-c4: 10
+
+outputFile: ''
