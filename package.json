@@ -1,5 +1,5 @@
 {
-	"name": "gen-algo",
+	"name": "@de-marauder/gen-algo",
 	"description": "Genetics algorithm for optimizing steam methane reforming reaction for higher production on hydrogen",
 	"version": "0.0.1",
 	"license": "MIT",
@@ -19,8 +19,7 @@
 		"de-marauder"
 	],
 	"files": [
-		"index.js",
-		"utils"
+		"bin/**/*"
 	],
 	"scripts": {
 		"start": "npm run create-default-config && node bin/cli/index.js",
