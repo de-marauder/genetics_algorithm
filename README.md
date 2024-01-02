@@ -13,6 +13,7 @@ npm link
 
 ## How to Use
 ### Base command
+```bash
 Usage: gen-algo [options] [command]
 
 Options:
@@ -24,8 +25,10 @@ Commands:
   show-config              Show current configuration
   run [options]            Run algorithm with config at $HOME/.gen-algo/config/defaultConfig.yaml
   help [command]           display help for command
+```
 
 ### Run command
+```bash
 Usage: gen-algo run [options]
 
 Run algorithm with config at $HOME/.gen-algo/config/defaultConfig.yaml
@@ -34,8 +37,10 @@ Options:
   -o, --outdir <path-to-output-file>    Absolute path to output file (default: "$HOME/output.txt")
   --config, <path-to-config-yaml-file>  Absolute path to config file (default: "$HOME/.gen-algo/config/defaultConfig.yaml")
   -h, --help                            display help for command
+```
 
 ### Update Config
+```bash
 Usage: gen-algo update-config [options]
 
 Update current configuration
@@ -43,14 +48,17 @@ Update current configuration
 Options:
   -p --path <string - path-to-file>  Path to configuration file
   -h, --help                         display help for command
+```
 
 ### Show Current Config
+```bash
 Usage: gen-algo show-config [options]
 
 Show current configuration
 
 Options:
   -h, --help  display help for command
+```
 
 ## Debugging
 Always remember to run the help commands for information on how to use the CLI
