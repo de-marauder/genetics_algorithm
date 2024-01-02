@@ -77,3 +77,6 @@ gen-algo update-config -p path/to/copied-and-updated/config-file
 ```
 
 After running the algorithm, the results are written to an `output.txt` file in the current working directory
+
+## Notes
+Checkt out the [WebUI](https://gen-algo-webui.vercel.app/) to have visualisations, more intuitive layout and persistence of successive runs
