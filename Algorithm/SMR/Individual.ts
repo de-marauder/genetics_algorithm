@@ -13,10 +13,10 @@ import { MBGeneticsAlgorithm } from '../MB';
 export class SMRIndividual {
 	traits: SMRIndividualType;
 	static traitBoundaries: IndividualConfig;
-  standardPressure: number
+	standardPressure: number
 	flareGasComposition: Compositions;
 
-  gasComponents: GasComponent[];
+	gasComponents: GasComponent[];
 
 	mbConfig: AlgoConfig;
 
@@ -27,6 +27,10 @@ export class SMRIndividual {
 	h: number;
 	f: number;
 	k: number;
+	K1: number = 0;
+	K2: number = 0;
+	K1K2: number = 0;
+	K3: number = 0;
 	error: number;
 
 	changeInCarbon: number;
@@ -41,20 +45,20 @@ export class SMRIndividual {
 		config: {
 			mbConfig: AlgoConfig;
 			traitBoundaries: IndividualConfig;
-      standardPressure: number,
-      flareGasComposition: Compositions
+			standardPressure: number,
+			flareGasComposition: Compositions
 		},
 		traits?: SMRIndividualType
 	) {
 		this.mbConfig = { ...config.mbConfig };
 		this.traits = this.spawnIndividual(traits);
 		SMRIndividual.traitBoundaries = { ...config.traitBoundaries };
-    this.standardPressure = config.standardPressure
-    this.flareGasComposition = config.flareGasComposition
+		this.standardPressure = config.standardPressure
+		this.flareGasComposition = config.flareGasComposition
 
-    this.gasComponents = Object.keys(
-      this.flareGasComposition
-    ) as GasComponent[];
+		this.gasComponents = Object.keys(
+			this.flareGasComposition
+		) as GasComponent[];
 
 		const {
 			x,
@@ -101,7 +105,7 @@ export class SMRIndividual {
 					K: this.equilibrumConstant,
 					steamCarbonRatio: this.traits.steamCarbonRatio,
 					totalPressure: this.traits.pressure,
-          flareGasComposition: this.flareGasComposition,
+					flareGasComposition: this.flareGasComposition,
 					standardPressure: this.standardPressure,
 				}
 			});
@@ -145,6 +149,22 @@ export class SMRIndividual {
 				amountOfWater
 			} = mbAlgo.population.population[0];
 			this.fitness = x;
+			// console.log(`SMR individual`, {
+			// 	x,
+			// 	y,
+			// 	a,
+			// 	b,
+			// 	h,
+			// 	f,
+			// 	fn,
+			// 	changeInCarbon,
+			// 	changeInHydrogen,
+			// 	changeInOxygen,
+			// 	amountOfCarbon,
+			// 	amountOfHydrogen,
+			// 	amountOfOxygen,
+			// 	amountOfWater
+			// })
 			return {
 				x,
 				y,
@@ -168,12 +188,30 @@ export class SMRIndividual {
 	}
 
 	get equilibrumConstant() {
-		const K1 =
-			((10266.76 * 10) ^
-				(6 * Math.exp(-(26830 / this.traits.temperature) + 30.114))) *
-			(10 * Math.exp(-5)) ** 2;
-		const K2 = Math.exp(4400 / this.traits.temperature + 4.036);
-		const K3 = K1 * K2;
+		const R = 8.314
+		// const K1 =
+		// 	((10266.76 * 10) ^
+		// 		(6 * Math.exp(-(26830 / this.traits.temperature) + 30.114))) *
+		// 	(10 * Math.exp(-5)) ** 2;
+		// const K2 = Math.exp(4400 / this.traits.temperature + 4.036);
+		// const K3 = K1 * K2;
+		// return +K3.toFixed(4);
+		/////////////////////////////
+		const E1 = 240.1;
+		const A1 = 4.225 * 10 ^ 15;
+		const K1 = A1 * Math.exp((E1 / (R * this.traits.temperature)));
+		this.K1 = K1
+		/////////////////////////////
+		const E2 = 67.13;
+		const A2 = 1.955 * 10 ^ 6;
+		const K2 = A2 * Math.exp((E2 / (R * this.traits.temperature)));
+		this.K2 = K2
+
+		this.K1K2 = this.K1 * this.K2
+		/////////////////////////////
+		const E3 = 243.9;
+		const A3 = 1.020 * 10 ^ 15;
+		const K3 = A3 * Math.exp((E3 / (R * this.traits.temperature)));
 		return +K3.toFixed(4);
 	}
 
@@ -210,21 +248,26 @@ export class SMRIndividual {
 	private static generatePressureValue(): number {
 		const lowerBound = this.traitBoundaries.pressureLowerbound;
 		const upperBound = this.traitBoundaries.pressureUpperbound;
-
-		return getRandomNumberInRange(lowerBound, upperBound);
+		const p = getRandomNumberInRange(lowerBound, upperBound);
+		console.log('generated pressure: ', p)
+		return p;
 	}
-
+	
 	private static generateTemperatureValue(): number {
 		const lowerBound = this.traitBoundaries.temperatureLowerbound;
 		const upperBound = this.traitBoundaries.temperatureUpperbound;
-
-		return getRandomNumberInRange(lowerBound, upperBound);
+		
+		const p = getRandomNumberInRange(lowerBound, upperBound);
+		console.log('generated TemperatureValue: ', p)
+		return p;
 	}
 
 	private static generateCarbonSteamRatioValue(): number {
 		const lowerBound = this.traitBoundaries.steamCarbonRatioLowerbound;
 		const upperBound = this.traitBoundaries.steamCarbonRatioUpperbound;
-
-		return getRandomNumberInRange(lowerBound, upperBound);
+		
+		const p = getRandomNumberInRange(lowerBound, upperBound);
+		console.log('generated CarbonSteamRatioValue: ', p)
+		return p;
 	}
 }

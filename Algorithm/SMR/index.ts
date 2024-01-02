@@ -189,33 +189,36 @@ export class SMRGeneticsAlgorithm {
     const probability = Math.random();
     const better = Math.max(individualA.fitness, individualB.fitness);
 
+    // console.log('=======================================')
+    // console.log()
+    // console.log('=======================================')
+    // console.log('probability: ', probability, '   better: ', better)
+    // console.log('individualA.traits before: ', individualA.traits, individualA.fitness)
+    // console.log('individualB.traits before: ', individualB.traits, individualB.fitness)
     for (const k in newIndividualTraits) {
       if (individualA.fitness === better && probability > 0.5) {
         newIndividualTraits[k as SMRTraits] = +(
-          probability *
-          (individualA.traits[k as SMRTraits] +
-            (1 - probability) * individualB.traits[k as SMRTraits])
+          (probability * individualA.traits[k as SMRTraits]) +
+          ((1 - probability) * individualB.traits[k as SMRTraits])
         ).toFixed(4);
       } else if (individualA.fitness === better && probability < 0.5) {
         newIndividualTraits[k as SMRTraits] = +(
-          (1 - probability) *
-          (individualA.traits[k as SMRTraits] +
-            probability * individualB.traits[k as SMRTraits])
+          ((1 - probability) * individualA.traits[k as SMRTraits]) +
+          (probability * individualB.traits[k as SMRTraits])
         ).toFixed(4);
       } else if (individualB.fitness === better && probability > 0.5) {
         newIndividualTraits[k as SMRTraits] = +(
-          (1 - probability) *
-          (individualA.traits[k as SMRTraits] +
-            probability * individualB.traits[k as SMRTraits])
+          ((1 - probability) * individualA.traits[k as SMRTraits]) +
+          (probability * individualB.traits[k as SMRTraits])
         ).toFixed(4);
       } else if (individualB.fitness === better && probability < 0.5) {
         newIndividualTraits[k as SMRTraits] = +(
-          probability *
-          (individualA.traits[k as SMRTraits] +
-            (1 - probability) * individualB.traits[k as SMRTraits])
+          (probability * individualA.traits[k as SMRTraits]) +
+          ((1 - probability) * individualB.traits[k as SMRTraits])
         ).toFixed(4);
       }
     }
+    // console.log('crossOverByRandomBiasedAveraging traits: ', newIndividualTraits)
 
     return new SMRIndividual(
       {
@@ -244,6 +247,12 @@ export class SMRGeneticsAlgorithm {
     const randKey = traitsList[randomId][0];
     const othersList = traitsList.filter((_, id) => id !== randomId);
 
+    // console.log('=======================================')
+    // console.log()
+    // console.log('=======================================')
+    // console.log('probability: ', probability, '   better: ', randKey)
+    // console.log('individualA.traits before: ', individualA.traits, individualA.fitness)
+    // console.log('individualB.traits before: ', individualB.traits, individualB.fitness)
     if (probability < 0.5) {
       // select randKey from A and the others from B
       newIndividualTraits[randKey as SMRTraits] =
@@ -263,6 +272,7 @@ export class SMRGeneticsAlgorithm {
           individualA.traits[k as SMRTraits];
       }
     }
+    // console.log('crossOverByRandomSelection traits: ', newIndividualTraits)
 
     return new SMRIndividual(
       {
@@ -281,8 +291,12 @@ export class SMRGeneticsAlgorithm {
   // Change them
   mutation(individualA: SMRIndividual): SMRIndividual {
     // individualA.getFitness()
+    // console.log('=======================================')
+    // console.log()
+    // console.log('=======================================')
     const newIndividualTraits = { ...individualA.traits };
     const traitsList = Object.entries(newIndividualTraits);
+    // console.log('before mutating traits: ', newIndividualTraits)
 
     const numberOfTraitsToChange = roundToNearestInteger(
       Math.random() * traitsList.length
@@ -302,7 +316,12 @@ export class SMRGeneticsAlgorithm {
         k as SMRTraits
       );
     }
-
+    // console.log('mutableTraits: ', mutableTraits)
+    // console.log('numberOfTraitsToChange: ', numberOfTraitsToChange)
+    // console.log('mutated traits: ', newIndividualTraits)
+    // console.log('=======================================')
+    // console.log()
+    // console.log('=======================================')
     const newIndividual = new SMRIndividual(
       {
         mbConfig: this.mbConfig,
@@ -320,7 +339,7 @@ export class SMRGeneticsAlgorithm {
   // Evalutes whether mutation should occur based on a 2% probability
   willMutate(): boolean {
     const n = getRandomNumberInRange(0, 100);
-    return +n.toFixed(0) > this.config.mutationProbability;
+    return +n.toFixed(0) <= this.config.mutationProbability;
   }
 
   // eveluates stopping criteria

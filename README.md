@@ -1,78 +1,71 @@
-# An Implementation of a Genetics Algorithm to Optimize Hydrogen Production From a Steam Methane Reforming Reaction
+# Gen Algo CLI
 
-This algorithm will focus on finding the following optimal parameters:
-1. Operation Pressure (Pt)
-2. Operation Temperature (T)
-3. Carbon - water(steam) ratio (C/S)
+A nodeJs based CLI for running a genetic algorithm to optimize hydrogen production from a given flare gas using a Steam Methane Reformer
 
-## Genetics Algorithm Rundown
+## Build Instructions
+```bash
+cd path/to/repo
+npm run build
+npm link
+```
+- The first npm command builds the CLI; compiling the typescript code down to javascript and also creates some directories and files to allow the CLI operate properly
+- The second npm command make the package available at a global level (kinda like installing it globally). This allows you to run the command `gen-algo` to use the application
 
-STEP 1:
-> - Algorithm accepts natural gas composition (moles), population size (n) and max no of generations (G)
-> -  Create a random population set of size n
-> -  Each element (individual) of the set contains random values for the optimal parameters
+## How to Use
+### Base command
+Usage: gen-algo [options] [command]
 
-STEP 2:
-> - Perfom the material balance procedures for each unique individual in the population
-> - Obtain the concentrations of hydrogen [y(h2)], carbon-dioxide [y(CO2)] and methane [y(CH4)] in the output of every individual and store
+Options:
+  -V, --version            output the version number
+  -h, --help               display help for command
 
-STEP 3:
-> - Pass the stored list of concentration values to a fitness function to rank and sort the current population in order of decreasing y(h2)
+Commands:
+  update-config [options]  Update current configuration
+  show-config              Show current configuration
+  run [options]            Run algorithm with config at $HOME/.gen-algo/config/defaultConfig.yaml
+  help [command]           display help for command
 
-STEP 4:
-> - Perform cross over and mutation operations conditionally and generate new generation
+### Run command
+Usage: gen-algo run [options]
 
-STEP 5:
-> - Iterate from step 2 until convergence is reached
+Run algorithm with config at $HOME/.gen-algo/config/defaultConfig.yaml
 
-STEP 6:
-> Convergence criteria shall be:
->   - Max number of generations (G)
->   - Overfitting (when the average of the last 10 generations remaains the same for over 10 generations)
+Options:
+  -o, --outdir <path-to-output-file>    Absolute path to output file (default: "$HOME/output.txt")
+  --config, <path-to-config-yaml-file>  Absolute path to config file (default: "$HOME/.gen-algo/config/defaultConfig.yaml")
+  -h, --help                            display help for command
 
-STEP 7:
-- Compare results with actual data
+### Update Config
+Usage: gen-algo update-config [options]
 
-## Material Balance Procedure For Implementing the Fitness function
+Update current configuration
 
-The reaction occurs in two main stages
+Options:
+  -p --path <string - path-to-file>  Path to configuration file
+  -h, --help                         display help for command
 
-1. > CH4 + H2O  <-->  CO + 3H2 (reforming)
-   > 
-   > **Input**: Natural gas (a mixture of hydrocarbons and other gases) and H20
-   > 
-   > **Output**: CO and H2 (syn gas)
+### Show Current Config
+Usage: gen-algo show-config [options]
 
-2. > CO + 2H2O  <-->  CO2 + 2H2 (water gas shift)
+Show current configuration
 
-3. > Total reaction: CH4 + 2H2O => CO2 + 4H2
+Options:
+  -h, --help  display help for command
 
-STEP 1:
-- > Identify the composition of the components of the natural gas
-- > Draw up an input output table showing the composition of all components involved in the reaction using the carbon - steam ratio (C/S)
-- > The algorithm will generate a value for C/S
+## Debugging
+Always remember to run the help commands for information on how to use the CLI
+```bash
+gen-algo [command] --help
+```
+or
+```bash
+gen-algo help
+```
 
-STEP 2
-- > Select two unknown components and make them 'x' and 'y'. Then, solve for other unknown outputs using elemental balances in terms of 'x' and 'y'
-- > Find the mole fraction (yi = moles of i/total no of moles in output) of the output components in the gas phase
+To update your configuration, you can copy the file at `$HOME/.gen-algo/config/defaultConfig.yaml` and make changes to it. Then supply the path of the changed file to the `update-config` command
+```bash
+cp $HOME/.gen-algo/config/defaultConfig.yaml path/to/copy/file/to
+gen-algo update-config -p path/to/copied-and-updated/config-file
+```
 
-STEP 3
-- Calculate equilibrium constants. 
-  
-  > K = (Pi/Pstand)output^(stoichiometric coefficient of i)/(Pi/Pstand)input^(stoichiometric coefficient of i) (according to the equation stoichiometry)
-  > ```
-  > K1 = 10266.76 * 10^6 * exp (-(26830/T) + 30.114)
-  > K2 = exp((4400/T) + 4.036)
-  > K3 = K1 * K2
-  > ```
-- > Calculate partial pressures of all components using dalton's law 
-  > ```
-  > Pi = yi * Pt
-  > ```
-- > The algorithm should generate Pt values (Total pressure)
-- > Obtain K(shift) and K(reform) as equilibrium constants for water gas shift and reforming reactions respectively. Using Xu and Froment's model. (Should be expressed in terms of T (temp) preferrably)
-- > The algorithm will generate values for T
-
-STEP 4
-- The algorithm solves the resulting equations for x and y (simultaneosly) for each generated solution sample and stores them. ??
-- The fitness function will identify the best solutions and send them to the next generation.
+After running the algorithm, the results are written to an `output.txt` file in the current working directory

@@ -98,6 +98,7 @@ export const main = ({
         )}  `;
         column += `H2 = ${individual.fitness.toFixed(2)} kmol  `;
         column += `CO2 = ${individual.y.toFixed(2)} kmol  `;
+        column += `CO = ${individual.b.toFixed(2)} kmol  `;
         column += `H2O = ${individual.h.toFixed(2)} kmol  `;
         column += `CH4 = ${individual.a.toFixed(2)} kmol  `;
 
@@ -113,7 +114,7 @@ export const main = ({
       }
       populationLines.push(line);
       console.log(
-        JSON.stringify(algo.population.population.map(el => el.fitness))
+        JSON.stringify(algo.population.population.map(el => `{${el.fitness}; ${el.traits.pressure}}`))
           .split(',')
           .join(',    ')
       );
@@ -129,6 +130,7 @@ export const main = ({
     console.log('CH4: ', algo.population.population[0].a);
     console.log('CO: ', algo.population.population[0].b);
     console.log('H2O: ', algo.population.population[0].h);
+    console.log('K1K2: ', algo.population.population[0].K1K2);
     console.log('K: ', algo.population.population[0].k);
     console.log('f: ', algo.population.population[0].f);
     console.log('e: ', algo.population.population[0].error);

@@ -1,16 +1,16 @@
 ---
 # steam methane reformaer algorithm config
 smrConfig:
-  smrPopSize: 50
-  smrGenSize: 50
-  smrMovingAverage: 10
+  smrPopSize: 10
+  smrGenSize: 20
+  smrMovingAverage: 7
   smrMutationProbability: 2
 
 # Reformer material balance algorithm config
 mbConfig:
-  mbPopSize: 50
-  mbGenSize: 50
-  mbMovingAverage: 10
+  mbPopSize: 5
+  mbGenSize: 10
+  mbMovingAverage: 5
   mbMutationProbability: 2
 
 standardPressure: 1.01325
@@ -30,7 +30,8 @@ flareGasComposition:
 
 traitBoundaries:
   # unit = bars
-  pressureLowerbound: 20 
+#  pressureLowerbound: 20 
+  pressureLowerbound: 3 
   pressureUpperbound: 30
   # unit = kelvin
   temperatureLowerbound: 600 

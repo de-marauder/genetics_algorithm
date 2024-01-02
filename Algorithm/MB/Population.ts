@@ -33,10 +33,14 @@ export class MBPopulation {
 	}
 
 	generateNewPopulation(): void {
+		// console.log('==========================================')
 		const populationPlusChildren = this.population.concat(this.children);
+		// console.log(this.population)
 		this.orderAccordingToFitness(populationPlusChildren);
 		this.population = populationPlusChildren.slice(0, this.size);
 		this.children = [];
+		// console.log(this.population)
+		// console.log('==========================================')
 	}
 
 	// Sorts individuals in population according to their fitness in place.

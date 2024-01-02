@@ -63,19 +63,40 @@ export class MBGeneticsAlgorithm {
 
 		let individualA: MBIndividual;
 		let individualB: MBIndividual;
+		// console.log('==============================')
+		// console.log('selecting individual...')
 		if (probability > 0.5) {
 			// Do tournament selection
+			// console.log('tournament selection')
 			individualA = this.tournamentSelection();
 			individualB = this.tournamentSelection();
 			while (individualA === individualB)
 				individualB = this.tournamentSelection();
 		} else {
 			// Do biased roulette selection
+			// console.log('biased roulette selection')
 			individualA = this.biasedRouletteSelection();
 			individualB = this.biasedRouletteSelection();
-			while (individualA === individualB)
-				individualB = this.biasedRouletteSelection();
+			let counter = 0;
+			while (individualA === individualB) {
+				if (counter <= 50) {
+					individualB = this.biasedRouletteSelection();
+				}
+				else if (counter > 50) {
+					individualB = this.tournamentSelection();
+				}
+				else if (counter > 100) {
+					console.log('Same individuals picked', individualA, individualB)
+					console.log(this.population.population)
+					console.log(this.population.population.length)
+					throw Error('Biased roulette failed to select')
+				}
+				counter++
+			}
 		}
+		// console.log('selecting individual done')
+		// console.log('==============================')
+
 		return { individualA, individualB };
 	}
 
@@ -104,18 +125,22 @@ export class MBGeneticsAlgorithm {
 	// Implements the biased roulette wheel selection approach
 	// A probability distribution is created based on the fitness of each individual
 	// A cummulation of the distribution is evaluated
-	// An individual is then selected randomly from the cummulated probability distribution
+	// An individual is then selected randomly from the cummulated probabilitomy distribution
 	biasedRouletteSelection(): MBIndividual {
 		const fitnessArr = this.population.population.map(el => el.fitness);
-		// Since higher fitness values is preferred
-		// we just take the quotient of the fitness and sum of fitnesses
+		// Since lower fitness values is preferred
+		// we normalize the fitnessArr so that lower fitness => higher probability
+		//then  we just take the quotient of the fitness and sum of fitnesses
 		const sum = fitnessArr.reduce((prev, curr) => prev + curr);
-		const probabilityDistribution = fitnessArr.map(el => el / sum);
+		const probabilityDistribution = fitnessArr.map(el => sum / el);
+		// const probabilityDistribution = fitnessArr.map(el => el / sum);
+		const sum2 = probabilityDistribution.reduce((prev, curr) => prev + curr);
+		const probabilityDistribution2 = probabilityDistribution.map(el => el / sum2);
 
 		const cummulatedProbabilityDistribution: number[] = [];
 		let cummulatedSum = 0;
-		for (let i = 0; i < probabilityDistribution.length; i++) {
-			cummulatedSum = cummulatedSum + probabilityDistribution[i];
+		for (let i = 0; i < probabilityDistribution2.length; i++) {
+			cummulatedSum = cummulatedSum + probabilityDistribution2[i];
 			cummulatedProbabilityDistribution.push(cummulatedSum);
 		}
 
@@ -123,9 +148,23 @@ export class MBGeneticsAlgorithm {
 
 		for (let i = 0; i < cummulatedProbabilityDistribution.length; i++) {
 			if (cummulatedProbabilityDistribution[i] > randProb) {
+				// console.log('fitnessArr: ', fitnessArr)
+				// console.log('sum: ', sum)
+				// console.log('sum2: ', sum2)
+				// console.log('randProb: ', randProb)
+				// console.log('probabilityDistribution: ', probabilityDistribution)
+				// console.log('probabilityDistribution2: ', probabilityDistribution2)
+				// console.log('cummulatedProbabilityDistribution: ', cummulatedProbabilityDistribution)
 				return this.population.population[i];
 			}
 		}
+		console.log('fitnessArr: ', fitnessArr)
+		console.log('sum: ', sum)
+		console.log('sum2: ', sum2)
+		console.log('randProb: ', randProb)
+		console.log('probabilityDistribution: ', probabilityDistribution)
+		console.log('probabilityDistribution2: ', probabilityDistribution2)
+		console.log('cummulatedProbabilityDistribution: ', cummulatedProbabilityDistribution)
 		throw new Error(
 			'Biased roulette selection could not select an individual'
 		);
@@ -140,11 +179,15 @@ export class MBGeneticsAlgorithm {
 		individualB: MBIndividual
 	): MBIndividual {
 		const modeSelectorProbabilty = Math.random();
+		// console.log('==============================')
+		// console.log('crossing over')
 		if (modeSelectorProbabilty > 0.2) {
 			// Do Mode 1
+			// console.log('crossOverByNormalAveraging')
 			return this.crossOverByNormalAveraging(individualA, individualB);
 		} else {
 			// Do mode 2
+			// console.log('crossOverByRandomBiasedAveraging')
 			return this.crossOverByRandomBiasedAveraging(
 				individualA,
 				individualB
@@ -159,6 +202,7 @@ export class MBGeneticsAlgorithm {
 	): MBIndividual {
 		const x = +((individualA.x + individualB.x) / 2).toFixed(2);
 		const y = +((individualA.y + individualB.y) / 2).toFixed(2);
+		// console.log('cross over done')
 		return new MBIndividual(this.individualConfig, x, y);
 	}
 
@@ -214,7 +258,7 @@ export class MBGeneticsAlgorithm {
 				(1 - probability) * individualB.y
 			).toFixed(4);
 		}
-
+		// console.log('cross over done')
 		return new MBIndividual(this.individualConfig, x, y);
 	}
 
@@ -222,8 +266,9 @@ export class MBGeneticsAlgorithm {
 	mutation(individualA: MBIndividual): MBIndividual {
 		// const x = getRandomNumberInRange(MBConfiguration.xmin, MBConfiguration.xmax)
 		// const y = getRandomNumberInRange(MBConfiguration.ymin, MBConfiguration.ymax)
-
+		// console.log('mutating....')
 		const newIndividual = new MBIndividual(this.individualConfig);
+		// console.log('mutating done')
 		return newIndividual;
 	}
 
@@ -238,7 +283,8 @@ export class MBGeneticsAlgorithm {
 		return (
 			this.population.isFit ||
 			this.hasConverged ||
-			this.generations.length >= this.mbConfig.genSize
+			this.generations.length >= this.mbConfig.genSize ||
+			this.population.population[0].fitness === 0
 		);
 	}
 

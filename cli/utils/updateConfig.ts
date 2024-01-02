@@ -87,10 +87,6 @@ export function updateConfig(opts: UpdateConfigOptions, defaultConfig: Config) {
       const traitBoundaries = { ...defaultConfig.traitBoundaries };
       configCheck(traitBoundaries, config.traitBoundaries, validOpts);
 
-      const sum = Object.values(traitBoundaries).reduce((prev, curr) => prev + curr);
-      if (sum !== 100)
-        throw new Error(`Invalid Configuration.\ntraitBoundaries total should be 100. Received ${sum}`);
-
       dconf.traitBoundaries = traitBoundaries;
     }
     if ('outputFile' in config) {

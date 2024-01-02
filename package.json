@@ -23,7 +23,7 @@
 		"utils"
 	],
 	"scripts": {
-		"start": "npm run create-default-config && node .bin/cli/index.js",
+		"start": "npm run create-default-config && node bin/cli/index.js",
 		"create-default-config": "mkdir -p $HOME/.gen-algo/config && cp ./Algorithm/defaultConfig.yaml $HOME/.gen-algo/config/",
 		"dev": "npm run create-default-config && tsc -p . --watch",
 		"build": "npm run create-default-config && tsc -p .",
@@ -36,11 +36,13 @@
 		"commander": "^11.0.0",
 		"js-yaml": "^4.1.0",
 		"meow": "^9.0.0",
+		"randomatic": "^3.1.1",
 		"typescript": "^5.1.6"
 	},
 	"devDependencies": {
 		"@types/cli-welcome": "^2.2.0",
 		"@types/node": "^20.4.9",
+		"@types/randomatic": "^3.1.3",
 		"@typescript-eslint/eslint-plugin": "^6.2.1",
 		"eslint": "^8.46.0",
 		"prettier": "^3.0.2",

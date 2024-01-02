@@ -2,8 +2,10 @@ import { getRandomNumberInRange } from '../helpers/functions';
 import { MBConfig } from './types';
 import { MBConfiguration } from './Config';
 import { GasComponent } from '../SMR/types';
+import randomatic from 'randomatic';
 
 export class MBIndividual {
+	_id: string;
 	x: number = 0; // H2
 	y: number = 0; // CO2
 	a: number = 0; // CH4
@@ -31,12 +33,13 @@ export class MBIndividual {
 	constructor(config: MBConfig, x?: number, y?: number) {
 		this.config = config;
 		this.spawnIndividual(x, y);
-
+		this._id = randomatic('0a')
 		let count = 0;
 		while (
 			this.x < 0 ||
 			this.y < 0 ||
-			this.a < 0 || //this.b < 0 ||
+			this.a < 0 || 
+			this.b < 0 ||
 			this.h < 0 ||
 			this.changeInCarbon < -1 ||
 			this.changeInCarbon > 1 ||
@@ -45,6 +48,7 @@ export class MBIndividual {
 			this.changeInOxygen < -1 ||
 			this.changeInOxygen > 1
 		) {
+			// console.log(this)
 			if (count > 1000) {
 				this.spawnIndividual(0, 0);
 				if (count > 5050) {
@@ -107,10 +111,20 @@ export class MBIndividual {
 				2 * this.amountOfCarbon
 			);
 
+		//////////////////////////////////////////////////////////
+		// this.x = +x.toFixed(4); // H2
+		// this.y = +(-(this.amountOfHydrogen + this.amountOfCarbon - x)).toFixed(4); // CO2
+		// this.a = +(this.amountOfCarbon - this.y).toFixed(4); // CO
+		// this.h = +(
+		// 	this.amountOfHydrogen + this.amountOfWater - this.x
+		// ).toFixed(4); // H2O
+		//////////////////////////////////////////////////////////
+
+		//////////////////////////////////////////////////////////
 		this.x = +x.toFixed(4); // H2
 		this.y = +y.toFixed(4); // CO2
-		this.a = +(this.amountOfCarbon - this.y).toFixed(4);
-		// this.b = +(this.amountOfCarbon - this.y).toFixed(4)  // CO
+		this.a = +((this.y - this.x + (this.amountOfHydrogen - this.amountOfOxygen + this.amountOfCarbon)) / 3).toFixed(4); // CH4
+		this.b = +(this.amountOfCarbon - this.a - this.y).toFixed(4)  // CO
 		this.h = +(
 			this.amountOfWater +
 			this.amountOfHydrogen -
@@ -124,6 +138,7 @@ export class MBIndividual {
 		this.changeInCarbon = changeInCarbon;
 		this.changeInHydrogen = changeInHydrogen;
 		this.changeInOxygen = changeInOxygen;
+		//////////////////////////////////////////////////////////
 		// if (
 		//   !(this.x < 0 || this.y < 0 ||
 		//     this.a < 0 || this.h < 0 ||
@@ -149,7 +164,7 @@ export class MBIndividual {
 		let amountOfHydrogen = 0;
 		let amountOfOxygen = 0;
 		for (const [component, amount] of Object.entries(
-      this.config.flareGasComposition //?? { CH4: 100 }
+			this.config.flareGasComposition //?? { CH4: 100 }
 		)) {
 			switch (component as GasComponent) {
 				case 'ch4':
@@ -216,17 +231,37 @@ export class MBIndividual {
 		changeInOxygen: number;
 	} {
 		// balance C (carbon)
-		// output => CO, CO2, H2, H2O
-		const changeInCarbon = this.amountOfCarbon - (this.y + this.a);
+		// output => CH4, CO, CO2, H2, H2O
+		const changeInCarbon = this.amountOfCarbon - (this.y + this.a + this.b);
 
 		// balance H2 (hydrogen)
 		const changeInHydrogen =
 			this.amountOfWater +
 			this.amountOfHydrogen -
 			(this.x + this.h + 2 * this.a);
+
 		// balance O (oxygen)
 		const changeInOxygen =
-			this.amountOfWater + this.amountOfOxygen - (this.h + this.y);
+			this.amountOfWater + this.amountOfOxygen - (this.b + this.h + 2 * this.y);
+
+		/////////////////////////////////////////////////////////////////////////////////
+		// // balance C (carbon)
+		// // output => CO, CO2, H2, H2O
+		// const changeInCarbon = this.amountOfCarbon - (this.y + this.a);
+
+		// // balance H2 (hydrogen)
+		// const changeInHydrogen =
+		// 	this.amountOfWater +
+		// 	this.amountOfHydrogen -
+		// 	(this.x + this.h);
+		// // (this.x + this.h + 2 * this.a);
+
+		// // balance O (oxygen)
+		// const changeInOxygen =
+		// 	this.amountOfWater + this.amountOfOxygen - (this.a + this.h + 2 * this.y);
+		// // this.amountOfWater + this.amountOfOxygen - (this.h + this.y);
+		//////////////////////////////////////////////////////////////////////
+
 
 		return { changeInCarbon, changeInHydrogen, changeInOxygen };
 	}
